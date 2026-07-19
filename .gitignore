@@ -1,0 +1,35 @@
+### === BACKEND (Java / Maven / Spring Boot) === ###
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/*.iml
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/HELP.md
+
+### === FRONTEND (Node / React / JavaScript) === ###
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/coverage/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+### === IDE / EDITOR === ###
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+### === DOCKER === ###
+docker-compose.override.yml
+
+### === VARIE === ###
+*.log
+.env
