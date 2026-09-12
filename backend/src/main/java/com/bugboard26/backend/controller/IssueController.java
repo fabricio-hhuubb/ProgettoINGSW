@@ -1,5 +1,7 @@
 package com.bugboard26.backend.controller;
 
+import com.bugboard26.backend.model.Role;
+import com.bugboard26.backend.dto.IssueUpdateRequest;
 import com.bugboard26.backend.dto.IssueCreateRequest;
 import com.bugboard26.backend.dto.IssueUpdateRequest;
 import com.bugboard26.backend.model.Issue;
