@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 
 function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -12,7 +14,7 @@ function LoginPage() {
 
         try {
             await login(email, password);
-            alert('Login effettuato con successo!'); 
+            navigate('/issues'); // reindirizza alla lista issue
         } catch (err) {
             setError('Email o password non corretti');
         }
