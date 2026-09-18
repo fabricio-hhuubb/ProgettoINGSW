@@ -36,10 +36,9 @@ function IssueListPage() {
                 <ul>
                     {issues.map((issue) => (
                         <li key={issue.id}>
-                            <Link to={"/issue/${issue.id}"}>
+                            <Link to={"/issues/${issue.id}"}>
                                 <strong>{issue.title}</strong>
                             </Link>
-                            <strong>{issue.title}</strong> — {issue.type} — {issue.status}
                             {issue.priority && ` — Priorità: ${issue.priority}`}
                             <br />
                             <small>{issue.description}</small>
