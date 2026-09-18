@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import IssueListPage from './pages/IssueListPage';
+import IssueFormPage from './pages/IssueFormPage';
+import IssueDetailPage from './pages/IssueDetailPage';
 
 function App() {
     return (
@@ -9,6 +11,8 @@ function App() {
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/issues" element={<IssueListPage />} />
+                <Route path="/issues/new" element={<IssueFormPage />} />
+                <Route path="/issues/:id" element={<IssueDetailPage />} />
                 <Route path="/" element={<Navigate to="/login" />} />
             </Routes>
         </BrowserRouter>

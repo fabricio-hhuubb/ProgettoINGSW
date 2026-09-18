@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getIssues } from '../services/issueService';
+import { Link } from 'react-router-dom';
+
 
 function IssueListPage() {
     const [issues, setIssues] = useState([]);
@@ -27,12 +29,16 @@ function IssueListPage() {
     return (
         <div>
             <h2>Lista Issue</h2>
+            <Link to="/issues/new">+ Nuova Issue</Link>
             {issues.length === 0 ? (
                 <p>Nessuna issue presente.</p>
             ) : (
                 <ul>
                     {issues.map((issue) => (
                         <li key={issue.id}>
+                            <Link to={"/issue/${issue.id}"}>
+                                <strong>{issue.title}</strong>
+                            </Link>
                             <strong>{issue.title}</strong> — {issue.type} — {issue.status}
                             {issue.priority && ` — Priorità: ${issue.priority}`}
                             <br />
