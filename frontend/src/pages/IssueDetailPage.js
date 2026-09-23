@@ -41,6 +41,10 @@ function IssueDetailPage() {
     return (
         <div>
             <h2>Dettaglio Issue #{id}</h2>
+            <h2>Sezione Commenti Issue</h2>
+            <h6>Titolo </h6>
+            <h3>Caricamento Commenti</h3>
+
 
             <h3>Commenti</h3>
             {comments.length === 0 ? (
