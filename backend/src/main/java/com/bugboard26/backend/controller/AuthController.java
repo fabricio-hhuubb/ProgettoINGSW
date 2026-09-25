@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.bugboard26.backend.security.UserDetailsImpl;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -57,7 +59,7 @@ public class AuthController {
         return ResponseEntity.ok("Logout effettuato");
     }
 
-    // REGISTRAZIONE (solo admin potrà chiamarla, lo gestiamo più avanti con @PreAuthorize)
+    // CREAZIONE UTENTE: accesso riservato agli admin in SecurityConfig
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
@@ -73,6 +75,16 @@ public class AuthController {
 
         return ResponseEntity.ok("Utente creato");
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserInfo> getCurrentUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+
+        return ResponseEntity.ok(new UserInfo(user.getEmail(), user.getRole()));
+    }
+
+    // Serve per restituire solo le informazioni utili al frontend
+    public record UserInfo(String email, Role role) {}
 
     // DTO interni (record Java: sintassi compatta per classi "dati")
     public record LoginRequest(String email, String password) {}

@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import IssueListPage from './pages/IssueListPage';
 import IssueFormPage from './pages/IssueFormPage';
 import IssueDetailPage from './pages/IssueDetailPage';
+import CreateUserPage from './pages/CreateUserPage';
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Route path="/issues/:id" element={<IssueDetailPage />} />
                 <Route path="/issues" element={<IssueListPage />} />
                 <Route path="/" element={<Navigate to="/login" />} />
+                <Route path="/users/new" element={<CreateUserPage />} />
             </Routes>
         </BrowserRouter>
     );

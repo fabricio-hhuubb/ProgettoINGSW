@@ -14,3 +14,8 @@ export const updateIssue = async (id, issueData) => {
     const response = await api.put(`/issues/${id}`, issueData);
     return response.data;
 };
+
+export const getIssueById = async (id) => {
+    const response = await api.get('/issue/${id}');
+    return response.data;
+}

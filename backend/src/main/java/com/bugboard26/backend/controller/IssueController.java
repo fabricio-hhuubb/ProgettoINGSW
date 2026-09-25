@@ -69,6 +69,15 @@ public class IssueController {
         return ResponseEntity.ok(issues);
     }
 
+    // Restituisce una issue tramite il suo id
+    @GetMapping("/{id}")
+    public ResponseEntity<Issue> getIssueById(@PathVariable Long id) {
+        return issueRepository.findById(id)
+                .map(issue -> ResponseEntity.ok(issue))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateIssue(
         @PathVariable Long id,

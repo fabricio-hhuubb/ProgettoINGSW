@@ -50,7 +50,13 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                // Solo gli amministratori possono creare nuovi utenti
+                .requestMatchers("/api/auth/register").hasRole("ADMIN")
+
+                // Login deve essere accessibile anche senza autenticazione
+                .requestMatchers("/api/auth/login").permitAll()
+
+                // Tutte le altre richieste richiedono un utente autenticato
                 .anyRequest().authenticated()
             );
 
