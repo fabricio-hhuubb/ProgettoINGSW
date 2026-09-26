@@ -38,6 +38,12 @@ public class Issue {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
+    // Utente incaricato di occuparsi della issue
+    // Può essere null quando la issue non è ancora assegnata
+    @ManyToOne
+    @JoinColumn(name = "assegnato_id")
+    private User assegnato;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -117,5 +123,13 @@ public class Issue {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public User getAssegnato() {
+        return assegnato;
+    }
+
+    public void setAssegnato(User assegnato) {
+        this.assegnato = assegnato;
     }
 }

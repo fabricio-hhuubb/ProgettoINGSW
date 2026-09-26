@@ -24,11 +24,13 @@ import java.util.List;
 public class IssueController {
 
     private final IssueRepository issueRepository;
+    private final UserRepository userRepository;
 
-    public IssueController(IssueRepository issueRepository) {
+    public IssueController(IssueRepository issueRepository,
+                       UserRepository userRepository) {
         this.issueRepository = issueRepository;
+        this.userRepository = userRepository;
     }
-
     @PostMapping
     public ResponseEntity<?> createIssue(@RequestBody IssueCreateRequest request,
                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -69,15 +71,6 @@ public class IssueController {
         return ResponseEntity.ok(issues);
     }
 
-    // Restituisce una issue tramite il suo id
-    @GetMapping("/{id}")
-    public ResponseEntity<Issue> getIssueById(@PathVariable Long id) {
-        return issueRepository.findById(id)
-                .map(issue -> ResponseEntity.ok(issue))
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-
     @PutMapping("/{id}")
     public ResponseEntity<?> updateIssue(
         @PathVariable Long id,
@@ -87,11 +80,17 @@ public class IssueController {
             Issue issue = issueRepository.findById(id).orElseThrow(() -> new RuntimeException("Issue non trovata"));
 
         User currentUser = userDetails.getUser();
-        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
-        boolean isAuthor = issue.getAuthor().getId().equals(currentUser.getId());
 
-        if (!isAdmin && !isAuthor) {
-            return ResponseEntity.status(403).body("Non hai i permessi per modificare questa issue");
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+
+        // Verifichiamo prima che esista un assegnatario
+        // poi confrontiamo il suo ID con quello dell'utente collegato
+        boolean isAssignee = issue.getAssegnato() != null
+                && issue.getAssegnato().getId().equals(currentUser.getId());
+
+        if (!isAdmin && !isAssignee) {
+            return ResponseEntity.status(403)
+                    .body("Non hai i permessi per modificare questa issue");
         }
 
         issue.setTitle(request.title());
