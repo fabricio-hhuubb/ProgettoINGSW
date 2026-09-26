@@ -85,10 +85,10 @@ public class IssueController {
 
         // Verifichiamo prima che esista un assegnatario
         // poi confrontiamo il suo ID con quello dell'utente collegato
-        boolean isAssignee = issue.getAssegnato() != null
+        boolean isAssegnato = issue.getAssegnato() != null
                 && issue.getAssegnato().getId().equals(currentUser.getId());
 
-        if (!isAdmin && !isAssignee) {
+        if (!isAdmin && !isAssegnato) {
             return ResponseEntity.status(403)
                     .body("Non hai i permessi per modificare questa issue");
         }
@@ -101,6 +101,40 @@ public class IssueController {
         Issue updated = issueRepository.save(issue);
 
         return ResponseEntity.ok(updated);
-    }   
+
+    } 
+    
+    // NUOVO METODO: salva l'utente assegnato alla issue
+    @PutMapping("/{id}/assegnato")
+    public ResponseEntity<?> assignIssue(
+            @PathVariable Long id,
+            @RequestBody AssegnazioneRequest request) {
+
+        Issue issue = issueRepository.findById(id).orElse(null);
+
+        if (issue == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (request.utenteId() == null) {
+            return ResponseEntity.badRequest()
+                    .body("Seleziona un utente");
+        }
+
+        User user = userRepository.findById(request.utenteId()).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.badRequest()
+                    .body("Utente non trovato");
+        }
+
+        issue.setAssegnato(user);
+        issueRepository.save(issue);
+
+        return ResponseEntity.ok("Assegnazione salvata");
+    }
+
+    // Dato ricevuto dal frontend: l'ID dell'utente scelto
+    public record AssegnazioneRequest(Long utenteId) {}
 
 }   
