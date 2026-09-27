@@ -103,6 +103,18 @@ public class IssueController {
         return ResponseEntity.ok(updated);
 
     } 
+
+    // Restituisce i dati della issue selezionata nel frontend
+    @GetMapping("/{id}")
+    public ResponseEntity<Issue> getIssueById(@PathVariable Long id) {
+        Issue issue = issueRepository.findById(id).orElse(null);
+
+        if(issue == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(issue);
+    }
     
     // NUOVO METODO: salva l'utente assegnato alla issue
     @PutMapping("/{id}/assegnato")

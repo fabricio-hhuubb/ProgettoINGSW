@@ -5,6 +5,7 @@ import IssueListPage from './pages/IssueListPage';
 import IssueFormPage from './pages/IssueFormPage';
 import IssueDetailPage from './pages/IssueDetailPage';
 import CreateUserPage from './pages/CreateUserPage';
+import IssueEditPage from './pages/IssueEditPage';
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                 <Route path="/issues" element={<IssueListPage />} />
                 <Route path="/" element={<Navigate to="/login" />} />
                 <Route path="/users/new" element={<CreateUserPage />} />
+                <Route path="issues/:id/edit" element={<IssueEditPage />} />
             </Routes>
         </BrowserRouter>
     );

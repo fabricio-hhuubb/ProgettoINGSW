@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { getIssues } from '../services/issueService';
-import { Link } from 'react-router-dom';
-import { getCurrentUser } from '../services/authService';
+import { Link, useNavigate } from 'react-router-dom';
+import { getCurrentUser, logout } from '../services/authService';
 
 
 function IssueListPage() {
+
+    const navigate = useNavigate();
+
+    const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState('');
+
     const [issues, setIssues] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -28,6 +34,25 @@ function IssueListPage() {
 
         checkUser();
     }, []);
+
+    const handleLogout = async () => {
+        setLoggingOut(true);
+        setLogoutError('');
+
+        try {
+            // Il backend invalida la sessione dell'utente
+            await logout();
+
+            // Torna alla pagina di accesso
+            navigate('/login', { replace: true });
+        } catch (err) {
+            setLogoutError('Impossibile uscire. Riprova.');
+        } finally {
+            setLoggingOut(false);
+        }
+    };
+
+
 
     const handleFilter = async (e) => {
         e.preventDefault();
@@ -78,6 +103,18 @@ function IssueListPage() {
     return (
         <div>
             <h2>Lista Issue</h2>
+
+            <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+            >
+                {loggingOut ? 'Uscita in corso...' : 'Esci'}
+            </button>
+
+            {logoutError && (
+                <p role="alert">{logoutError}</p>
+            )}
 
             <Link to="/issues/new">+ Nuova Issue</Link>
             

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getIssueById } from '../services/issueService';
+import { getIssueById, assignIssue } from '../services/issueService';
 import { getComments, addComment } from '../services/commentService';
+import { getCurrentUser } from '../services/authService';
+import { getUsers } from '../services/userService';
 
 function IssueDetailPage() {
     const { id } = useParams();
@@ -15,8 +17,39 @@ function IssueDetailPage() {
     const [error, setError] = useState('');
     const [commentError, setCommentError] = useState('');
 
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [selectedUserId, setSelectedUserId] = useState('');
+
+    const [assigning, setAssigning] = useState(false);
+    const [assignmentError, setAssignmentError] = useState('');
+    const [assignmentSuccess, setAssignmentSuccess] = useState('');   
+
+    const [currentUserEmail, setCurrentUserEmail] = useState('');
+
     useEffect(() => {
-        // Evita di aggiornare questa pagina se nel frattempo la lasci.
+        const loadUsers = async () => {
+            try {
+                const currentUser = await getCurrentUser();
+                // L'email ci permette di conoscere l'assegnatario
+                setCurrentUserEmail(currentUser.email);
+                const admin = currentUser.role == 'ADMIN';
+
+                setIsAdmin(admin);
+
+                if (admin) {
+                    const data = await getUsers();
+                    setUsers(data);
+                }
+            } catch (err){
+                setAssignmentError('Impossibile caricare i dati per l assegnazione');
+            }
+        };
+        loadUsers();
+    }, []);
+
+    useEffect(() => {
+        // Evita di aggiornare questa pagina se nel frattempo la lasci
         let active = true;
 
         const fetchDetails = async () => {
@@ -83,6 +116,37 @@ function IssueDetailPage() {
 
     if (loading) return <p>Caricamento...</p>;
 
+    const handleAssign = async (e) => {
+        e.preventDefault();
+
+        if (!selectedUserId || assigning) return;
+
+        setAssigning(true);
+        setAssignmentError('');
+        setAssignmentSuccess('');
+
+        try {
+            // Il menu restituisce una stringa: la convertiamo in numero
+            const utenteId = Number(selectedUserId);
+
+            await assignIssue(id, utenteId);
+
+            // Aggiorniamo a video l'assegnatario dopo il salvataggio
+            const selectedUser = users.find((user) => user.id === utenteId);
+
+            setIssue((previousIssue) => ({
+                ...previousIssue,
+                assegnato: selectedUser,
+            }));
+
+            setAssignmentSuccess('Assegnazione salvata.');
+        } catch (err) {
+            setAssignmentError('Impossibile salvare l’assegnazione.');
+        } finally {
+            setAssigning(false);
+        }
+    };
+
     if (error) {
         return (
             <div>
@@ -98,6 +162,18 @@ function IssueDetailPage() {
 
             <h2>{issue.title}</h2>
 
+            {(isAdmin || (
+                currentUserEmail !== ''
+                && issue.assegnato != null
+                && issue.assegnato.email === currentUserEmail
+            )) && (
+                <p>
+                    <Link to={'/issues/' + id + '/edit'}>
+                        Modifica issue
+                    </Link>
+                </p>
+            )}
+
             <p><strong>ID:</strong> {issue.id}</p>
             <p><strong>Tipo:</strong> {issue.type}</p>
             <p><strong>Stato:</strong> {issue.status}</p>
@@ -105,6 +181,48 @@ function IssueDetailPage() {
                 <strong>Priorità:</strong> {issue.priority || 'Non specificata'}
             </p>
             <p><strong>Autore:</strong> {issue.author?.email}</p>
+
+            <p>
+                <strong>Assegnato a:</strong>{' '}
+                {issue.assegnato ? issue.assegnato.email : 'Nessuno'}
+            </p>
+
+            {isAdmin && (
+                <form onSubmit={handleAssign}>
+                    <label htmlFor="assigned-user">Assegna a: </label>
+
+                    <select
+                        id="assigned-user"
+                        value={selectedUserId}
+                        onChange={(e) => setSelectedUserId(e.target.value)}
+                        disabled={assigning}
+                        required
+                    >
+                        <option value="">Seleziona un utente</option>
+
+                        {users.map((user) => (
+                            <option key={user.id} value={user.id}>
+                                {user.email}
+                            </option>
+                        ))}
+                    </select>
+
+                    <button
+                        type="submit"
+                        disabled={assigning || !selectedUserId}
+                    >
+                        {assigning ? 'Salvataggio...' : 'Salva assegnazione'}
+                    </button>
+                </form>
+            )}
+
+            {assignmentError && (
+                <p role="alert">{assignmentError}</p>
+            )}
+
+            {assignmentSuccess && (
+                <p role="status">{assignmentSuccess}</p>
+            )}
 
             <h3>Descrizione</h3>
             <p style={{ whiteSpace: 'pre-wrap' }}>
