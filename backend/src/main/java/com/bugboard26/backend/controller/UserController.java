@@ -26,6 +26,6 @@ public class UserController {
 
         return users;
     }
-
+    //Record Useroption
     public record UserOption(Long id, String email) {}
 }
