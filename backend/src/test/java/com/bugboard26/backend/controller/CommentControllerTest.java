@@ -15,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class CommentControllerTest {
@@ -77,4 +78,50 @@ class CommentControllerTest {
         assertSame(issue, commentoCreato.getIssue());
         assertNotNull(commentoCreato.getCreatedAt());
     }
+
+    @Test
+void nonPuoCommentareIssueInesistente() {
+
+ // 1. PREPARAZIONE
+
+    CommentRepository commentRepository = mock(CommentRepository.class);
+    IssueRepository issueRepository = mock(IssueRepository.class);
+
+    CommentController controller = new CommentController(
+            commentRepository,
+            issueRepository
+    );
+
+    User utente = new User(
+            "utente@test.it",
+            "password-test",
+            Role.USER
+    );
+
+    CommentCreateRequest request = new CommentCreateRequest(
+            "Vorrei aggiungere un commento"
+    );
+
+    // Simuliamo che la issue cercata non esista.
+    when(issueRepository.findById(99L))
+            .thenReturn(Optional.empty());
+
+
+    // 2. ESECUZIONE E VERIFICA
+
+    RuntimeException exception = assertThrows(
+            RuntimeException.class,
+            () -> controller.addComment(
+                    99L,
+                    request,
+                    new UserDetailsImpl(utente)
+            )
+    );
+
+    assertEquals("Issue non trovata", exception.getMessage());
+
+    // Non deve essere salvato nessun commento.
+    verify(commentRepository, never()).save(any(Comment.class));
+}
+
 }
