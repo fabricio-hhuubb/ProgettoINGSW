@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class IssueControllerTest {
@@ -202,4 +203,74 @@ class IssueControllerTest {
 
         verify(issueRepository).findAll();
     }
+
+@Test
+void utenteNonAssegnatarioNonPuoModificareIssue() {
+
+    // 1. PREPARAZIONE
+
+    IssueRepository issueRepository = mock(IssueRepository.class);
+    UserRepository userRepository = mock(UserRepository.class);
+
+    IssueController controller = new IssueController(
+            issueRepository,
+            userRepository
+    );
+
+    // Utente che tenta la modifica.
+    User utente = mock(User.class);
+    when(utente.getId()).thenReturn(2L);
+    when(utente.getRole()).thenReturn(Role.USER);
+
+    // Utente diverso, a cui è assegnata la issue.
+    User assegnato = mock(User.class);
+    when(assegnato.getId()).thenReturn(3L);
+
+    Issue issue = new Issue(
+            "Titolo originale",
+            "Descrizione originale",
+            IssueType.BUG,
+            utente
+    );
+
+    issue.setPriority(Priority.LOW);
+    issue.setAssegnato(assegnato);
+
+    IssueUpdateRequest request = new IssueUpdateRequest(
+            "Titolo modificato",
+            "Descrizione modificata",
+            IssueType.DOCUMENTATION,
+            Priority.HIGH
+    );
+
+    when(issueRepository.findById(1L))
+            .thenReturn(Optional.of(issue));
+
+
+    // 2. ESECUZIONE
+
+    var response = controller.updateIssue(
+            1L,
+            request,
+            new UserDetailsImpl(utente)
+    );
+
+
+    // 3. VERIFICA
+
+    // La modifica deve essere negata.
+    assertEquals(403, response.getStatusCode().value());
+
+    // I dati devono restare invariati.
+    assertEquals("Titolo originale", issue.getTitle());
+    assertEquals("Descrizione originale", issue.getDescription());
+    assertEquals(IssueType.BUG, issue.getType());
+    assertEquals(Priority.LOW, issue.getPriority());
+
+    // Non deve essere richiesto alcun salvataggio.
+    verify(issueRepository, never()).save(any(Issue.class));
+}    
+
+
+
 }
