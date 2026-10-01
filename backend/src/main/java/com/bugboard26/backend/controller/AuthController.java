@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.bugboard26.backend.security.UserDetailsImpl;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -48,6 +49,7 @@ public class AuthController {
         return ResponseEntity.ok("Login effettuato");
     }
 
+
     // LOGOUT
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
@@ -62,6 +64,12 @@ public class AuthController {
     // CREAZIONE UTENTE: accesso riservato agli admin in SecurityConfig
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+
+        // Controlliamo la password originale prima dell'hashing
+        if (request.password() == null || request.password().isBlank()) {
+            return ResponseEntity.badRequest().body("La password non può essere vuota o contenere solo spazi");
+        }
+
         if (userRepository.existsByEmail(request.email())) {
             return ResponseEntity.badRequest().body("Email già registrata");
         }
