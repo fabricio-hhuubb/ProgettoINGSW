@@ -101,31 +101,35 @@ function IssueListPage() {
 
 
     return (
-        <div>
+        <div className="issue-list-page">
             <h2>Lista Issue</h2>
+
+            <div className="issue-actions">
+            <div className="issue-actions-left">
+                <Link to="/issues/new" className="action-button action-primary">
+                + Nuova issue
+                </Link>
+
+                {isAdmin && (
+                <Link to="/users/new" className="action-button action-secondary">
+                    Crea utente
+                </Link>
+                )}
+            </div>
 
             <button
                 type="button"
+                className="action-button action-secondary"
                 onClick={handleLogout}
                 disabled={loggingOut}
             >
-                {loggingOut ? 'Uscita in corso...' : 'Esci'}
+                {loggingOut ? "Uscita..." : "Esci"}
             </button>
+            </div>
 
-            {logoutError && (
-                <p role="alert">{logoutError}</p>
-            )}
-
-            <Link to="/issues/new">+ Nuova Issue</Link>
-            
-            {/* Questo significa che questo isAdmin è true, allora mostra quello che c è qui dentro */}
-            {isAdmin && (
-                <p>
-                    <Link to="/users/new">Crea utente</Link>
-                </p>
-            )}
+            {logoutError && <p role="alert">{logoutError}</p>}
     
-            <form onSubmit={handleFilter}>
+            <form className="filters" onSubmit={handleFilter}>
                 <div>
                     <label htmlFor="type-filter">Tipo: </label>
                     <select
@@ -169,7 +173,7 @@ function IssueListPage() {
                     </select>
                 </div>
 
-                <button type="submit" disabled={loading}>
+                <button type="submit" className="action-button action-primary">
                     Applica filtri
                 </button>
             </form>
@@ -186,9 +190,9 @@ function IssueListPage() {
                 issues.length === 0 ? (
                     <p>Nessuna issue trovata.</p>
                 ) : (
-                    <ul>
+                    <ul className="issue-list">
                         {issues.map((issue) => (
-                            <li key={issue.id}>
+                            <li className="issue-card" key={issue.id}>
                                 <Link to={`/issues/${issue.id}`}>
                                     <strong>{issue.title}</strong>
                                 </Link>

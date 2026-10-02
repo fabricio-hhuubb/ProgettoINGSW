@@ -20,108 +20,106 @@ import static org.mockito.Mockito.*;
 
 class CommentControllerTest {
 
-    @Test // Controlla che l'aggiunta di un commento sia corretta
-    void utentePuoAggiungereCommento() {
-        
-        // Con mockito creiamo i repository senza usare il database
-        CommentRepository commentRepository = mock(CommentRepository.class);
-        IssueRepository issueRepository = mock(IssueRepository.class);
+        @Test // Controlla che l'aggiunta di un commento sia corretta
+        void utentePuoAggiungereCommento() {
+                
+                // Con mockito creiamo i repository senza usare il database
+                CommentRepository commentRepository = mock(CommentRepository.class);
+                IssueRepository issueRepository = mock(IssueRepository.class);
 
-        CommentController controller = new CommentController(
-                commentRepository,
-                issueRepository
-        );
+                CommentController controller = new CommentController(
+                        commentRepository,
+                        issueRepository
+                );
 
-        User utente = new User(
-                "utente@test.it",
-                "password-test",
-                Role.USER
-        );
+                User utente = new User(
+                        "utente@test.it",
+                        "password-test",
+                        Role.USER
+                );
 
-        Issue issue = new Issue(
-                "Errore nel login",
-                "Non riesco ad accedere",
-                IssueType.BUG,
-                utente
-        );
+                Issue issue = new Issue(
+                        "Errore nel login",
+                        "Non riesco ad accedere",
+                        IssueType.BUG,
+                        utente
+                );
 
-        CommentCreateRequest request = new CommentCreateRequest(
-                "Il problema si verifica anche sul mio computer"
-        );
+                CommentCreateRequest request = new CommentCreateRequest(
+                        "Il problema si verifica anche sul mio computer"
+                );
 
-        // La issue con ID 1 esiste
-        when(issueRepository.findById(1L))
-                .thenReturn(Optional.of(issue));
-
-
-        // Esecuzione
-        var response = controller.addComment(
-                1L,
-                request,
-                new UserDetailsImpl(utente)
-        );
+                // La issue con ID 1 esiste
+                when(issueRepository.findById(1L))
+                        .thenReturn(Optional.of(issue));
 
 
-        // Controllo che i risultati siano corretti
-        assertEquals(200, response.getStatusCode().value());
-
-        // Recuperiamo il commento passato al repository tramite Captor
-        ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
-
-        verify(commentRepository).save(captor.capture());
-
-        Comment commentoCreato = captor.getValue();
-
-        assertEquals("Il problema si verifica anche sul mio computer", commentoCreato.getText());
-
-        assertSame(utente, commentoCreato.getAuthor());
-        assertSame(issue, commentoCreato.getIssue());
-        assertNotNull(commentoCreato.getCreatedAt());
-    }
-
-    @Test
-void nonPuoCommentareIssueInesistente() {
-
- // 1. PREPARAZIONE
-
-    CommentRepository commentRepository = mock(CommentRepository.class);
-    IssueRepository issueRepository = mock(IssueRepository.class);
-
-    CommentController controller = new CommentController(
-            commentRepository,
-            issueRepository
-    );
-
-    User utente = new User(
-            "utente@test.it",
-            "password-test",
-            Role.USER
-    );
-
-    CommentCreateRequest request = new CommentCreateRequest(
-            "Vorrei aggiungere un commento"
-    );
-
-    // Simuliamo che la issue cercata non esista.
-    when(issueRepository.findById(99L))
-            .thenReturn(Optional.empty());
+                // Esecuzione
+                var response = controller.addComment(
+                        1L,
+                        request,
+                        new UserDetailsImpl(utente)
+                );
 
 
-    // 2. ESECUZIONE E VERIFICA
+                // Controllo che i risultati siano corretti
+                assertEquals(200, response.getStatusCode().value());
 
-    RuntimeException exception = assertThrows(
-            RuntimeException.class,
-            () -> controller.addComment(
-                    99L,
-                    request,
-                    new UserDetailsImpl(utente)
-            )
-    );
+                // Recuperiamo il commento passato al repository tramite Captor
+                ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
 
-    assertEquals("Issue non trovata", exception.getMessage());
+                verify(commentRepository).save(captor.capture());
 
-    // Non deve essere salvato nessun commento.
-    verify(commentRepository, never()).save(any(Comment.class));
-}
+                Comment commentoCreato = captor.getValue();
+
+                assertEquals("Il problema si verifica anche sul mio computer", commentoCreato.getText());
+
+                assertSame(utente, commentoCreato.getAuthor());
+                assertSame(issue, commentoCreato.getIssue());
+                assertNotNull(commentoCreato.getCreatedAt());
+        }
+
+        @Test
+        void nonPuoCommentareIssueInesistente() {
+
+                CommentRepository commentRepository = mock(CommentRepository.class);
+                IssueRepository issueRepository = mock(IssueRepository.class);
+
+                CommentController controller = new CommentController(
+                        commentRepository,
+                        issueRepository
+                );
+
+                User utente = new User(
+                        "utente@test.it",
+                        "password-test",
+                        Role.USER
+                );
+
+                CommentCreateRequest request = new CommentCreateRequest(
+                        "Vorrei aggiungere un commento"
+                );
+
+                // Simuliamo che la issue cercata non esista
+                when(issueRepository.findById(99L))
+                        .thenReturn(Optional.empty());
+
+
+                // Esegue
+
+                RuntimeException exception = assertThrows(
+                        RuntimeException.class,
+                        () -> controller.addComment(
+                                99L,
+                                request,
+                                new UserDetailsImpl(utente)
+                        )
+                );
+
+                assertEquals("Issue non trovata", exception.getMessage());
+
+                // Non deve essere salvato nessun commento
+                verify(commentRepository, never()).save(any(Comment.class));
+        }
 
 }

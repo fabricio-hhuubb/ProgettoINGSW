@@ -93,16 +93,18 @@ function IssueEditPage() {
     }
 
     return (
-        <div>
-            <Link to={'/issues/' + id}>Torna al dettaglio</Link>
-
+        <div className="issue-form-page">
             <h2>Modifica issue</h2>
 
             {error && <p role="alert">{error}</p>}
 
             {canEdit && (
-                <form onSubmit={handleSubmit}>
+                <form className="issue-form" onSubmit={handleSubmit}>
                     <div>
+                        <Link to={'/issues/' + id} className="back-link">
+                            Torna al dettaglio
+                        </Link>
+
                         <label htmlFor="edit-title">Titolo:</label>
                         <input
                             id="edit-title"
@@ -120,6 +122,7 @@ function IssueEditPage() {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             required
+                            rows={6}
                         />
                     </div>
 

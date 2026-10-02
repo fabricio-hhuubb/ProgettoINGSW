@@ -11,3 +11,610 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+/* Dimensioni comprensive di bordi e spazi interni */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f3f5f9;
+    color: #243247;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
+
+/* Contenitore della pagina */
+.issue-list-page {
+    max-width: none;
+    margin: 24px;
+    padding: 28px;
+    background-color: white;
+    border: 1px solid #dde3ec;
+    border-radius: 12px;
+}
+
+.issue-list-page h2 {
+    margin-top: 0;
+    font-size: 28px;
+}
+
+/* Collegamenti */
+.issue-list-page a {
+    color: #2459b8;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.issue-list-page a:hover {
+    text-decoration: underline;
+}
+
+/* Pulsanti */
+.issue-list-page button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background-color: #2459b8;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.issue-list-page button:hover {
+    background-color: #19458f;
+}
+
+.issue-list-page button:disabled {
+    background-color: #65748a;
+    cursor: not-allowed;
+}
+
+/* Spazio tra Esci e Nuova Issue */
+.issue-list-page > button {
+    margin-right: 16px;
+}
+
+/* Filtri affiancati, con ritorno a capo se manca spazio */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px;
+    margin: 24px 0;
+    padding: 20px;
+    background-color: #f5f7fb;
+    border-radius: 8px;
+}
+
+.filters > div {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filters label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.filters select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #aab6c6;
+    border-radius: 6px;
+    background-color: white;
+    color: #243247;
+    font: inherit;
+}
+
+/* Evidenzia il controllo selezionato con la tastiera */
+.issue-list-page a:focus-visible,
+.issue-list-page button:focus-visible,
+.filters select:focus-visible {
+    outline: 3px solid #2459b8;
+    outline-offset: 3px;
+}
+
+/* Elenco e riquadri delle issue */
+.issue-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.issue-card {
+    margin-bottom: 14px;
+    padding: 20px;
+    border: 1px solid #dde3ec;
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.issue-card > a {
+    font-size: 18px;
+}
+
+.issue-card p {
+    margin: 10px 0;
+}
+
+.issue-card small {
+    color: #526177;
+}
+
+/* Adattamento agli schermi piccoli */
+@media (max-width: 600px) {
+    .issue-list-page {
+        margin: 16px;
+        padding: 18px;
+    }
+
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filters > div {
+        min-width: 0;
+    }
+}
+
+/* Pagina di login */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 36px;
+    background-color: white;
+    border: 1px solid #dde3ec;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(36, 50, 71, 0.08);
+}
+
+.login-brand {
+    margin: 0 0 24px;
+    color: #2459b8;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.login-card h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.login-description {
+    margin: 0 0 28px;
+    color: #526177;
+}
+
+.login-field {
+    margin-bottom: 20px;
+}
+
+.login-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.login-field input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #aab6c6;
+    border-radius: 6px;
+    background-color: white;
+    color: #243247;
+    font: inherit;
+}
+
+.login-field input:focus-visible,
+.login-button:focus-visible {
+    outline: 3px solid #2459b8;
+    outline-offset: 3px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #2459b8;
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #19458f;
+}
+
+.login-error {
+    padding: 12px;
+    border: 1px solid #e8b4b4;
+    border-radius: 6px;
+    background-color: #fff1f1;
+    color: #a32020;
+}
+
+.login-help {
+    margin: 24px 0 0;
+    color: #526177;
+    font-size: 14px;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 24px;
+    }
+}
+
+
+.issue-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.issue-actions-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Stesso aspetto per i link e i pulsanti */
+.issue-list-page .action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.issue-list-page .action-primary {
+  background-color: #2459b8;
+  border-color: #2459b8;
+  color: white;
+}
+
+.issue-list-page .action-primary:hover {
+  background-color: #19458f;
+  border-color: #19458f;
+  text-decoration: none;
+}
+
+.issue-list-page .action-secondary {
+  background-color: white;
+  border-color: #aab6c6;
+  color: #243247;
+}
+
+.issue-list-page .action-secondary:hover {
+  background-color: #edf1f7;
+  text-decoration: none;
+}
+
+.issue-list-page .action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .issue-actions {
+    flex-wrap: wrap;
+  }
+}
+
+
+.issue-form-page {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 28px;
+  background-color: white;
+  border: 1px solid #dde3ec;
+  border-radius: 12px;
+}
+
+.issue-form-page .back-link {
+  color: #2459b8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.issue-form-page .back-link:hover {
+  text-decoration: underline;
+}
+
+.issue-form-page h2 {
+  margin: 20px 0 24px;
+  font-size: 28px;
+}
+
+.issue-form > div {
+  margin-bottom: 20px;
+}
+
+.issue-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.issue-form input,
+.issue-form textarea,
+.issue-form select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #aab6c6;
+  border-radius: 6px;
+  background-color: white;
+  color: #243247;
+  font: inherit;
+}
+
+.issue-form textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.issue-form button[type="submit"] {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2459b8;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.issue-form button[type="submit"]:hover {
+  background-color: #19458f;
+}
+
+.issue-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.issue-form input:focus-visible,
+.issue-form textarea:focus-visible,
+.issue-form select:focus-visible,
+.issue-form button:focus-visible,
+.issue-form-page .back-link:focus-visible {
+  outline: 3px solid #2459b8;
+  outline-offset: 3px;
+}
+
+@media (max-width: 850px) {
+  .issue-form-page {
+    margin: 16px;
+    padding: 20px;
+  }
+}
+
+
+.issue-detail-page {
+  margin: 24px;
+  padding: 28px;
+  background-color: white;
+  border: 1px solid #dde3ec;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+
+.detail-back-link {
+  color: #2459b8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.detail-back-link:hover {
+  text-decoration: underline;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.detail-header h2 {
+  margin: 0;
+  font-size: 28px;
+  min-width: 0;
+}
+
+.detail-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  padding: 20px;
+  background-color: #f5f7fb;
+  border-radius: 8px;
+}
+
+.detail-info p {
+  margin: 0;
+}
+
+.detail-section {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #dde3ec;
+  border-radius: 8px;
+}
+
+.detail-section h3 {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.detail-text {
+  white-space: pre-wrap;
+}
+
+.issue-detail-page .detail-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid #2459b8;
+  border-radius: 6px;
+  background-color: #2459b8;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.issue-detail-page .detail-button:hover {
+  background-color: #19458f;
+  border-color: #19458f;
+}
+
+.issue-detail-page .detail-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.assignment-form {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.assignment-field {
+  flex: 1;
+  min-width: 0;
+  max-width: 500px;
+}
+
+.assignment-form label,
+.comment-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.assignment-form select,
+.comment-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #aab6c6;
+  border-radius: 6px;
+  background-color: white;
+  color: #243247;
+  font: inherit;
+}
+
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comment-card {
+  margin-bottom: 14px;
+  padding: 16px;
+  background-color: #f5f7fb;
+  border: 1px solid #dde3ec;
+  border-radius: 8px;
+}
+
+.comment-card p {
+  margin: 10px 0;
+}
+
+.comment-card small,
+.detail-muted {
+  color: #526177;
+}
+
+.comment-form {
+  margin-top: 24px;
+}
+
+.comment-form textarea {
+  display: block;
+  margin-bottom: 12px;
+  resize: vertical;
+  min-height: 110px;
+}
+
+.detail-error,
+.detail-success {
+  padding: 12px;
+  border: 1px solid;
+  border-radius: 6px;
+}
+
+.detail-error {
+  color: #a32020;
+  background-color: #fff1f1;
+  border-color: #e8b4b4;
+}
+
+.detail-success {
+  color: #24613b;
+  background-color: #edf8f0;
+  border-color: #b8d9c2;
+}
+
+.issue-detail-page a:focus-visible,
+.issue-detail-page button:focus-visible,
+.issue-detail-page select:focus-visible,
+.issue-detail-page textarea:focus-visible {
+  outline: 3px solid #2459b8;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .issue-detail-page {
+    margin: 16px;
+    padding: 18px;
+  }
+
+  .detail-section {
+    padding: 16px;
+  }
+
+  .assignment-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .assignment-field {
+    width: 100%;
+    max-width: none;
+  }
+}

@@ -26,251 +26,387 @@ import static org.mockito.Mockito.*;
 
 class IssueControllerTest {
 
-    @Test  // Serve a testare la funziona updateIssue
-    void adminPuoModificareIssue() {
+        @Test  // Serve a testare la funziona updateIssue
+        void adminPuoModificareIssue() {
 
-        // Creiamo repository simulati senza collegarci al database
-        IssueRepository issueRepository = mock(IssueRepository.class);
-        UserRepository userRepository = mock(UserRepository.class);
+                // Creiamo repository simulati senza collegarci al database
+                IssueRepository issueRepository = mock(IssueRepository.class);
+                UserRepository userRepository = mock(UserRepository.class);
 
-        IssueController controller = new IssueController(
-                issueRepository,
-                userRepository
-        );
+                IssueController controller = new IssueController(
+                        issueRepository,
+                        userRepository
+                );
 
-        User admin = new User(
-                "admin@test.it",
-                "password-test",
-                Role.ADMIN
-        );
+                User admin = new User(
+                        "admin@test.it",
+                        "password-test",
+                        Role.ADMIN
+                );
 
-        Issue issue = new Issue(
-                "Titolo originale",
-                "Descrizione originale",
-                IssueType.BUG,
-                admin
-        );
-        issue.setPriority(Priority.LOW);
+                Issue issue = new Issue(
+                        "Titolo originale",
+                        "Descrizione originale",
+                        IssueType.BUG,
+                        admin
+                );
+                issue.setPriority(Priority.LOW);
 
-        IssueUpdateRequest request = new IssueUpdateRequest(
-                "Titolo modificato",
-                "Descrizione modificata",
-                IssueType.DOCUMENTATION,
-                Priority.HIGH
-        );
+                IssueUpdateRequest request = new IssueUpdateRequest(
+                        "Titolo modificato",
+                        "Descrizione modificata",
+                        IssueType.DOCUMENTATION,
+                        Priority.HIGH
+                );
 
-        // Quando il controller cerca l'ID 1 restituiamo la nostra issue
-        when(issueRepository.findById(1L))
-                .thenReturn(Optional.of(issue));
+                // Quando il controller cerca l'ID 1 restituiamo la nostra issue
+                when(issueRepository.findById(1L))
+                        .thenReturn(Optional.of(issue));
 
-        // Quando richiede il salvataggio, restituiamo la stessa issue
-        when(issueRepository.save(issue))
-                .thenReturn(issue);
-
-
-        // Procediamo
-
-        var response = controller.updateIssue(
-                1L,
-                request,
-                new UserDetailsImpl(admin)
-        );
+                // Quando richiede il salvataggio, restituiamo la stessa issue
+                when(issueRepository.save(issue))
+                        .thenReturn(issue);
 
 
-        // Check che tutto sia corretto
+                // Procediamo
 
-        // L'operazione deve riuscire
-        assertEquals(200, response.getStatusCode().value());
-
-        // I dati devono essere stati aggiornati
-        assertEquals("Titolo modificato", issue.getTitle());
-        assertEquals("Descrizione modificata", issue.getDescription());
-        assertEquals(IssueType.DOCUMENTATION, issue.getType());
-        assertEquals(Priority.HIGH, issue.getPriority());
-
-        // Il controller deve aver richiesto il salvataggio una volta
-        verify(issueRepository).save(issue);
-    }
-
-    @Test // Controlla la corretta creazione di una issue
-    void utentePuoCreareIssue() {
-
-        // Creazione con mockito per non usare il database
-        IssueRepository issueRepository = mock(IssueRepository.class);
-        UserRepository userRepository = mock(UserRepository.class);
-
-        IssueController controller = new IssueController(
-                issueRepository,
-                userRepository
-        );
-
-        User utente = new User(
-                "utente@test.it",
-                "password-test",
-                Role.USER
-        );
-
-        IssueCreateRequest request = new IssueCreateRequest(
-                "Errore nel login",
-                "Non riesco ad accedere",
-                IssueType.BUG,
-                Priority.HIGH
-        );
+                var response = controller.updateIssue(
+                        1L,
+                        request,
+                        new UserDetailsImpl(admin)
+                );
 
 
-        // Esecuzione
+                // Check che tutto sia corretto
 
-        var response = controller.createIssue(
-                request,
-                new UserDetailsImpl(utente)
-        );
+                // L'operazione deve riuscire
+                assertEquals(200, response.getStatusCode().value());
 
+                // I dati devono essere stati aggiornati
+                assertEquals("Titolo modificato", issue.getTitle());
+                assertEquals("Descrizione modificata", issue.getDescription());
+                assertEquals(IssueType.DOCUMENTATION, issue.getType());
+                assertEquals(Priority.HIGH, issue.getPriority());
 
-        // Controllo dei risultati
-        assertEquals(200, response.getStatusCode().value());
+                // Il controller deve aver richiesto il salvataggio una volta
+                verify(issueRepository).save(issue);
+        }
 
-        // Recuperiamo la issue che il controller ha passato a save()
-        // ArgumentCaptor intercetta la creazione dell'oggetto e ci permette di verificare i dati
-        ArgumentCaptor<Issue> captor = ArgumentCaptor.forClass(Issue.class);
+        @Test // Controlla la corretta creazione di una issue
+        void utentePuoCreareIssue() {
 
-        verify(issueRepository).save(captor.capture());
+                // Creazione con mockito per non usare il database
+                IssueRepository issueRepository = mock(IssueRepository.class);
+                UserRepository userRepository = mock(UserRepository.class);
 
-        Issue issueCreata = captor.getValue();
+                IssueController controller = new IssueController(
+                        issueRepository,
+                        userRepository
+                );
 
-        assertEquals("Errore nel login", issueCreata.getTitle());
-        assertEquals("Non riesco ad accedere", issueCreata.getDescription());
-        assertEquals(IssueType.BUG, issueCreata.getType());
-        assertEquals(Priority.HIGH, issueCreata.getPriority());
+                User utente = new User(
+                        "utente@test.it",
+                        "password-test",
+                        Role.USER
+                );
 
-        // La nuova issue deve partire dallo stato TODO
-        assertEquals(IssueStatus.TODO, issueCreata.getStatus());
-
-        // L'autore deve essere proprio l'utente collegato
-        assertSame(utente, issueCreata.getAuthor());
-    }
-
-    @Test // Controlla che il filtro funzioni correttamente perciò creiamo due issue con diversi tipi
-    void filtroPerTipoRestituisceSoloBug() {
-
-        // Repository con mockito sempre
-        IssueRepository issueRepository = mock(IssueRepository.class);
-        UserRepository userRepository = mock(UserRepository.class);
-
-        IssueController controller = new IssueController(
-                issueRepository,
-                userRepository
-        );
-
-        User utente = new User(
-                "utente@test.it",
-                "password-test",
-                Role.USER
-        );
-
-        Issue bug = new Issue(
-                "Errore nel login",
-                "Non riesco ad accedere",
-                IssueType.BUG,
-                utente
-        );
-
-        Issue feature = new Issue(
-                "Aggiungere tema scuro",
-                "Vorrei poter scegliere il tema",
-                IssueType.FEATURE,
-                utente
-        );
-
-        // Il repository restituisce due issue di tipo diverso
-        when(issueRepository.findAll())
-                .thenReturn(List.of(bug, feature));
+                IssueCreateRequest request = new IssueCreateRequest(
+                        "Errore nel login",
+                        "Non riesco ad accedere",
+                        IssueType.BUG,
+                        Priority.HIGH
+                );
 
 
-        // Verifichiamo che tutto sia corretto
-        // Filtriamo per BUG
-        var response = controller.getIssues(
-                IssueType.BUG,
-                null,
-                null
-        );
+                // Esecuzione
+
+                var response = controller.createIssue(
+                        request,
+                        new UserDetailsImpl(utente)
+                );
 
 
-        // Check
-        assertEquals(200, response.getStatusCode().value());
+                // Controllo dei risultati
+                assertEquals(200, response.getStatusCode().value());
 
-        // La risposta deve contenere soltanto la issue di tipo BUG
-        assertEquals(List.of(bug), response.getBody());
+                // Recuperiamo la issue che il controller ha passato a save()
+                // ArgumentCaptor intercetta la creazione dell'oggetto e ci permette di verificare i dati
+                ArgumentCaptor<Issue> captor = ArgumentCaptor.forClass(Issue.class);
 
-        verify(issueRepository).findAll();
-    }
+                verify(issueRepository).save(captor.capture());
 
-@Test
-void utenteNonAssegnatarioNonPuoModificareIssue() {
+                Issue issueCreata = captor.getValue();
 
-    // 1. PREPARAZIONE
+                assertEquals("Errore nel login", issueCreata.getTitle());
+                assertEquals("Non riesco ad accedere", issueCreata.getDescription());
+                assertEquals(IssueType.BUG, issueCreata.getType());
+                assertEquals(Priority.HIGH, issueCreata.getPriority());
 
-    IssueRepository issueRepository = mock(IssueRepository.class);
-    UserRepository userRepository = mock(UserRepository.class);
+                // La nuova issue deve partire dallo stato TODO
+                assertEquals(IssueStatus.TODO, issueCreata.getStatus());
 
-    IssueController controller = new IssueController(
-            issueRepository,
-            userRepository
-    );
+                // L'autore deve essere proprio l'utente collegato
+                assertSame(utente, issueCreata.getAuthor());
+        }
 
-    // Utente che tenta la modifica.
-    User utente = mock(User.class);
-    when(utente.getId()).thenReturn(2L);
-    when(utente.getRole()).thenReturn(Role.USER);
+        @Test // Controlla che il filtro funzioni correttamente perciò creiamo due issue con diversi tipi
+        void filtroPerTipoRestituisceSoloBug() {
 
-    // Utente diverso, a cui è assegnata la issue.
-    User assegnato = mock(User.class);
-    when(assegnato.getId()).thenReturn(3L);
+                // Repository con mockito sempre
+                IssueRepository issueRepository = mock(IssueRepository.class);
+                UserRepository userRepository = mock(UserRepository.class);
 
-    Issue issue = new Issue(
-            "Titolo originale",
-            "Descrizione originale",
-            IssueType.BUG,
-            utente
-    );
+                IssueController controller = new IssueController(
+                        issueRepository,
+                        userRepository
+                );
 
-    issue.setPriority(Priority.LOW);
-    issue.setAssegnato(assegnato);
+                User utente = new User(
+                        "utente@test.it",
+                        "password-test",
+                        Role.USER
+                );
 
-    IssueUpdateRequest request = new IssueUpdateRequest(
-            "Titolo modificato",
-            "Descrizione modificata",
-            IssueType.DOCUMENTATION,
-            Priority.HIGH
-    );
+                Issue bug = new Issue(
+                        "Errore nel login",
+                        "Non riesco ad accedere",
+                        IssueType.BUG,
+                        utente
+                );
 
-    when(issueRepository.findById(1L))
-            .thenReturn(Optional.of(issue));
+                Issue feature = new Issue(
+                        "Aggiungere tema scuro",
+                        "Vorrei poter scegliere il tema",
+                        IssueType.FEATURE,
+                        utente
+                );
 
-
-    // 2. ESECUZIONE
-
-    var response = controller.updateIssue(
-            1L,
-            request,
-            new UserDetailsImpl(utente)
-    );
+                // Il repository restituisce due issue di tipo diverso
+                when(issueRepository.findAll())
+                        .thenReturn(List.of(bug, feature));
 
 
-    // 3. VERIFICA
+                // Verifichiamo che tutto sia corretto
+                // Filtriamo per BUG
+                var response = controller.getIssues(
+                        IssueType.BUG,
+                        null,
+                        null
+                );
 
-    // La modifica deve essere negata.
-    assertEquals(403, response.getStatusCode().value());
 
-    // I dati devono restare invariati.
-    assertEquals("Titolo originale", issue.getTitle());
-    assertEquals("Descrizione originale", issue.getDescription());
-    assertEquals(IssueType.BUG, issue.getType());
-    assertEquals(Priority.LOW, issue.getPriority());
+                // Check
+                assertEquals(200, response.getStatusCode().value());
 
-    // Non deve essere richiesto alcun salvataggio.
-    verify(issueRepository, never()).save(any(Issue.class));
-}    
+                // La risposta deve contenere soltanto la issue di tipo BUG
+                assertEquals(List.of(bug), response.getBody());
 
+                verify(issueRepository).findAll();
+        }
+
+        @Test
+        void utenteNonAssegnatarioNonPuoModificareIssue() {
+
+                // Solito repository con mockito
+                IssueRepository issueRepository = mock(IssueRepository.class);
+                UserRepository userRepository = mock(UserRepository.class);
+
+                IssueController controller = new IssueController(
+                        issueRepository,
+                        userRepository
+                );
+
+                // Utente che tenta la modifica
+                User utente = mock(User.class);
+                when(utente.getId()).thenReturn(2L);
+                when(utente.getRole()).thenReturn(Role.USER);
+
+                // Utente diverso a cui è assegnata la issue
+                User assegnato = mock(User.class);
+                when(assegnato.getId()).thenReturn(3L);
+
+                Issue issue = new Issue(
+                        "Titolo originale",
+                        "Descrizione originale",
+                        IssueType.BUG,
+                        utente
+                );
+
+                issue.setPriority(Priority.LOW);
+                issue.setAssegnato(assegnato);
+
+                IssueUpdateRequest request = new IssueUpdateRequest(
+                        "Titolo modificato",
+                        "Descrizione modificata",
+                        IssueType.DOCUMENTATION,
+                        Priority.HIGH
+                );
+
+                when(issueRepository.findById(1L))
+                        .thenReturn(Optional.of(issue));
+
+
+                // Esecuzione
+                var response = controller.updateIssue(
+                        1L,
+                        request,
+                        new UserDetailsImpl(utente)
+                );
+
+                // Controllo dei dati corretti
+
+                // La modifica deve essere negata
+                assertEquals(403, response.getStatusCode().value());
+
+                // I dati devono restare invariati
+                assertEquals("Titolo originale", issue.getTitle());
+                assertEquals("Descrizione originale", issue.getDescription());
+                assertEquals(IssueType.BUG, issue.getType());
+                assertEquals(Priority.LOW, issue.getPriority());
+
+                // Non deve essere richiesto alcun salvataggio
+                verify(issueRepository, never()).save(any(Issue.class));
+        }    
+        
+        @Test
+        void assegnatarioPuoModificareIssue() {
+
+                // Preparazione con mockito
+                IssueRepository issueRepository = mock(IssueRepository.class);
+                UserRepository userRepository = mock(UserRepository.class);
+
+                IssueController controller = new IssueController(
+                        issueRepository,
+                        userRepository
+                );
+
+                User autore = new User(
+                        "autore@test.it",
+                        "password-test",
+                        Role.USER
+                );
+
+                // L'utente collegato è un utente normale con ID 2
+                User assegnato = mock(User.class);
+                when(assegnato.getId()).thenReturn(2L);
+                when(assegnato.getRole()).thenReturn(Role.USER);
+
+                Issue issue = new Issue(
+                        "Titolo originale",
+                        "Descrizione originale",
+                        IssueType.BUG,
+                        autore
+                );
+
+                issue.setAssegnato(assegnato);
+                issue.setPriority(Priority.LOW);
+
+                IssueUpdateRequest request = new IssueUpdateRequest(
+                        "Titolo modificato",
+                        "Descrizione modificata",
+                        IssueType.DOCUMENTATION,
+                        Priority.HIGH
+                );
+
+                when(issueRepository.findById(1L))
+                        .thenReturn(Optional.of(issue));
+
+                when(issueRepository.save(issue))
+                        .thenReturn(issue);
+
+                // Esecuzione
+                var response = controller.updateIssue(
+                        1L,
+                        request,
+                        new UserDetailsImpl(assegnato)
+                );
+
+                // Controllo risultati
+                assertEquals(200, response.getStatusCode().value());
+
+                assertEquals("Titolo modificato", issue.getTitle());
+                assertEquals("Descrizione modificata", issue.getDescription());
+                assertEquals(IssueType.DOCUMENTATION, issue.getType());
+                assertEquals(Priority.HIGH, issue.getPriority());
+
+                // La modifica non deve cambiare autore o assegnatario
+                assertSame(autore, issue.getAuthor());
+                assertSame(assegnato, issue.getAssegnato());
+
+                verify(issueRepository).save(issue);
+        }
+
+
+        @Test
+        void filtroPerStatoEPriorita() {
+
+                // Preparazione con mockito
+                IssueRepository issueRepository = mock(IssueRepository.class);
+                UserRepository userRepository = mock(UserRepository.class);
+
+                IssueController controller = new IssueController(
+                        issueRepository,
+                        userRepository
+                );
+
+                User autore = new User(
+                        "autore@test.it",
+                        "password-test",
+                        Role.USER
+                );
+
+                // Questa issue rispetta entrambi i filtri
+                Issue daFareAlta = new Issue(
+                        "Errore nel login",
+                        "Accesso non riuscito",
+                        IssueType.BUG,
+                        autore
+                );
+                daFareAlta.setStatus(IssueStatus.TODO);
+                daFareAlta.setPriority(Priority.HIGH);
+
+                // Stesso stato ma priorità diversa, deve essere esclusa
+                Issue daFareBassa = new Issue(
+                        "Errore grafico",
+                        "Colore del pulsante errato",
+                        IssueType.BUG,
+                        autore
+                );
+                daFareBassa.setStatus(IssueStatus.TODO);
+                daFareBassa.setPriority(Priority.LOW);
+
+                // Stessa priorità ma stato diverso anche questa deve essere esclusa
+                Issue risoltaAlta = new Issue(
+                        "Errore nel salvataggio",
+                        "Problema già risolto",
+                        IssueType.BUG,
+                        autore
+                );
+                risoltaAlta.setStatus(IssueStatus.RESOLVED);
+                risoltaAlta.setPriority(Priority.HIGH);
+
+                when(issueRepository.findAll()).thenReturn(
+                        List.of(daFareAlta, daFareBassa, risoltaAlta)
+                );
+
+
+                // Esecuzione
+                // Nessun filtro per tipo, filtriamo per stato e priorità
+                var response = controller.getIssues(
+                        null,
+                        IssueStatus.TODO,
+                        Priority.HIGH
+                );
+
+
+                // Controllo dei risultati
+                assertEquals(200, response.getStatusCode().value());
+
+                // Deve restare soltanto la issue che soddisfa entrambi i filtri.
+                assertEquals(List.of(daFareAlta), response.getBody());
+
+                verify(issueRepository).findAll();
+        }
 
 
 }

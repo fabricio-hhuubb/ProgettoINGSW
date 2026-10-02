@@ -77,12 +77,14 @@ function CreateUserPage() {
     }
 
     return (
-        <div>
-            <Link to="/issues">Torna alle issue</Link>
+        <div className="issue-form-page">
+            <Link to="/issues" className="back-link">
+                Torna alla lista
+            </Link>
 
             <h2>Crea utente</h2>
 
-            <form onSubmit={handleSubmit}>
+            <form className="issue-form" onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="user-email">Email:</label>
                     <input

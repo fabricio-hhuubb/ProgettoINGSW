@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { createIssue } from '../services/issueService';
+import { Link, useNavigate } from "react-router-dom";
 
 function IssueFormPage() {
     const [title, setTitle] = useState('');
@@ -28,10 +28,13 @@ function IssueFormPage() {
     };
 
     return (
-        <div>
+        <div className="issue-form-page">
             <h2>Nuova Issue</h2>
-            <form onSubmit={handleSubmit}>
+            <form className="issue-form" onSubmit={handleSubmit}>
                 <div>
+                    <Link to="/issues" className="back-link">
+                        Torna alla lista
+                    </Link>
                     <label>Titolo:</label>
                     <input
                         type="text"
@@ -46,6 +49,7 @@ function IssueFormPage() {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required
+                        rows={6}
                     />
                 </div>
                 <div>

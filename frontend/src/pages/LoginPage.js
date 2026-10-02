@@ -21,30 +21,56 @@ function LoginPage() {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <button type="submit">Accedi</button>
-            </form>
+        <div className="login-page">
+            <div className="login-card">
+                <p className="login-brand">BugBoard26</p>
+
+                <h2>Accedi</h2>
+                <p className="login-description">
+                    Inserisci le tue credenziali per gestire le issue.
+                </p>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="login-field">
+                        <label htmlFor="login-email">Email</label>
+                        <input
+                            id="login-email"
+                            type="email"
+                            autoComplete="username"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="nome@esempio.it"
+                            required
+                        />
+                    </div>
+
+                    <div className="login-field">
+                        <label htmlFor="login-password">Password</label>
+                        <input
+                            id="login-password"
+                            type="password"
+                            autoComplete="current-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    {error && (
+                        <p className="login-error" role="alert">
+                            {error}
+                        </p>
+                    )}
+
+                    <button className="login-button" type="submit">
+                        Accedi
+                    </button>
+                </form>
+
+                <p className="login-help">
+                    Non hai un account? Rivolgiti all’amministratore.
+                </p>
+            </div>
         </div>
     );
 }

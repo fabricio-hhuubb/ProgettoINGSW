@@ -157,122 +157,151 @@ function IssueDetailPage() {
     }
 
     return (
-        <div>
-            <Link to="/issues">Torna alla lista</Link>
+        <div className="issue-detail-page">
+            <Link to="/issues" className="detail-back-link">
+                ← Torna alla lista
+            </Link>
 
-            <h2>{issue.title}</h2>
+            <div className="detail-header">
+                <h2>{issue.title}</h2>
 
-            {(isAdmin || (
-                currentUserEmail !== ''
-                && issue.assegnato != null
-                && issue.assegnato.email === currentUserEmail
-            )) && (
-                <p>
-                    <Link to={'/issues/' + id + '/edit'}>
+                {(isAdmin || (
+                    currentUserEmail !== ''
+                    && issue.assegnato != null
+                    && issue.assegnato.email === currentUserEmail
+                )) && (
+                    <Link
+                        to={'/issues/' + id + '/edit'}
+                        className="detail-button"
+                    >
                         Modifica issue
                     </Link>
+                )}
+            </div>
+
+            <div className="detail-info">
+                <p><strong>ID:</strong> {issue.id}</p>
+                <p><strong>Tipo:</strong> {issue.type}</p>
+                <p><strong>Stato:</strong> {issue.status}</p>
+                <p>
+                    <strong>Priorità:</strong>{' '}
+                    {issue.priority || 'Non specificata'}
                 </p>
-            )}
-
-            <p><strong>ID:</strong> {issue.id}</p>
-            <p><strong>Tipo:</strong> {issue.type}</p>
-            <p><strong>Stato:</strong> {issue.status}</p>
-            <p>
-                <strong>Priorità:</strong> {issue.priority || 'Non specificata'}
-            </p>
-            <p><strong>Autore:</strong> {issue.author?.email}</p>
-
-            <p>
-                <strong>Assegnato a:</strong>{' '}
-                {issue.assegnato ? issue.assegnato.email : 'Nessuno'}
-            </p>
+                <p><strong>Autore:</strong> {issue.author?.email}</p>
+                <p>
+                    <strong>Assegnato a:</strong>{' '}
+                    {issue.assegnato ? issue.assegnato.email : 'Nessuno'}
+                </p>
+            </div>
 
             {isAdmin && (
-                <form onSubmit={handleAssign}>
-                    <label htmlFor="assigned-user">Assegna a: </label>
+                <section className="detail-section">
+                    <h3>Assegnazione</h3>
 
-                    <select
-                        id="assigned-user"
-                        value={selectedUserId}
-                        onChange={(e) => setSelectedUserId(e.target.value)}
-                        disabled={assigning}
-                        required
+                    <form
+                        className="assignment-form"
+                        onSubmit={handleAssign}
                     >
-                        <option value="">Seleziona un utente</option>
+                        <div className="assignment-field">
+                            <label htmlFor="assigned-user">Assegna a</label>
 
-                        {users.map((user) => (
-                            <option key={user.id} value={user.id}>
-                                {user.email}
-                            </option>
-                        ))}
-                    </select>
+                            <select
+                                id="assigned-user"
+                                value={selectedUserId}
+                                onChange={(e) => setSelectedUserId(e.target.value)}
+                                disabled={assigning}
+                                required
+                            >
+                                <option value="">Seleziona un utente</option>
 
-                    <button
-                        type="submit"
-                        disabled={assigning || !selectedUserId}
-                    >
-                        {assigning ? 'Salvataggio...' : 'Salva assegnazione'}
-                    </button>
-                </form>
+                                {users.map((user) => (
+                                    <option key={user.id} value={user.id}>
+                                        {user.email}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button
+                            className="detail-button"
+                            type="submit"
+                            disabled={assigning || !selectedUserId}
+                        >
+                            {assigning ? 'Salvataggio...' : 'Salva assegnazione'}
+                        </button>
+                    </form>
+                </section>
             )}
 
             {assignmentError && (
-                <p role="alert">{assignmentError}</p>
+                <p className="detail-error" role="alert">
+                    {assignmentError}
+                </p>
             )}
 
             {assignmentSuccess && (
-                <p role="status">{assignmentSuccess}</p>
+                <p className="detail-success" role="status">
+                    {assignmentSuccess}
+                </p>
             )}
 
-            <h3>Descrizione</h3>
-            <p style={{ whiteSpace: 'pre-wrap' }}>
-                {issue.description}
-            </p>
+            <section className="detail-section">
+                <h3>Descrizione</h3>
+                <p className="detail-text">{issue.description}</p>
+            </section>
 
-            <h3>Commenti</h3>
+            <section className="detail-section">
+                <h3>Commenti</h3>
 
-            {comments.length === 0 ? (
-                <p>Nessun commento ancora.</p>
-            ) : (
-                <ul>
-                    {comments.map((comment) => (
-                        <li key={comment.id}>
-                            <strong>{comment.author?.email}</strong>
-                            <p style={{ whiteSpace: 'pre-wrap' }}>
-                                {comment.text}
-                            </p>
-                            <small>
-                                {new Date(comment.createdAt).toLocaleString('it-IT')}
-                            </small>
-                        </li>
-                    ))}
-                </ul>
-            )}
+                {comments.length === 0 ? (
+                    <p className="detail-muted">Nessun commento ancora.</p>
+                ) : (
+                    <ul className="comment-list">
+                        {comments.map((comment) => (
+                            <li className="comment-card" key={comment.id}>
+                                <strong>{comment.author?.email}</strong>
 
-            <form onSubmit={handleAddComment}>
-                <label htmlFor="new-comment">Nuovo commento</label>
-                <br />
-                <textarea
-                    id="new-comment"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Scrivi un commento..."
-                    disabled={sending}
-                    required
-                />
+                                <p className="detail-text">{comment.text}</p>
 
-                {commentError && (
-                    <p role="alert">{commentError}</p>
+                                <small>
+                                    {new Date(comment.createdAt).toLocaleString('it-IT')}
+                                </small>
+                            </li>
+                        ))}
+                    </ul>
                 )}
 
-                <br />
-                <button
-                    type="submit"
-                    disabled={sending || !newComment.trim()}
+                <form
+                    className="comment-form"
+                    onSubmit={handleAddComment}
                 >
-                    {sending ? 'Invio in corso...' : 'Invia'}
-                </button>
-            </form>
+                    <label htmlFor="new-comment">Nuovo commento</label>
+
+                    <textarea
+                        id="new-comment"
+                        rows={4}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Scrivi un commento..."
+                        disabled={sending}
+                        required
+                    />
+
+                    {commentError && (
+                        <p className="detail-error" role="alert">
+                            {commentError}
+                        </p>
+                    )}
+
+                    <button
+                        className="detail-button"
+                        type="submit"
+                        disabled={sending || !newComment.trim()}
+                    >
+                        {sending ? 'Invio in corso...' : 'Invia commento'}
+                    </button>
+                </form>
+            </section>
         </div>
     );
 }
