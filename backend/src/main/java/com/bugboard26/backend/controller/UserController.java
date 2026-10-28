@@ -1,10 +1,14 @@
 package com.bugboard26.backend.controller;
 
-import com.bugboard26.backend.repository.UserRepository;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bugboard26.backend.dto.UserOption;
+import com.bugboard26.backend.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,6 +30,5 @@ public class UserController {
 
         return users;
     }
-    
-    public record UserOption(Long id, String email) {}
+
 }

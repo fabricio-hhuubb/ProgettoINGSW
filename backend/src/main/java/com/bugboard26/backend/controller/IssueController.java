@@ -1,23 +1,30 @@
 package com.bugboard26.backend.controller;
 
-import com.bugboard26.backend.model.Role;
-import com.bugboard26.backend.dto.IssueUpdateRequest;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bugboard26.backend.dto.AssegnazioneRequest;
 import com.bugboard26.backend.dto.IssueCreateRequest;
 import com.bugboard26.backend.dto.IssueUpdateRequest;
 import com.bugboard26.backend.model.Issue;
 import com.bugboard26.backend.model.IssueStatus;
 import com.bugboard26.backend.model.IssueType;
+import com.bugboard26.backend.model.Priority;
+import com.bugboard26.backend.model.Role;
 import com.bugboard26.backend.model.User;
 import com.bugboard26.backend.repository.IssueRepository;
 import com.bugboard26.backend.repository.UserRepository;
 import com.bugboard26.backend.security.UserDetailsImpl;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import com.bugboard26.backend.model.IssueType;
-import com.bugboard26.backend.model.IssueStatus;
-import com.bugboard26.backend.model.Priority;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/issues")
@@ -27,13 +34,14 @@ public class IssueController {
     private final UserRepository userRepository;
 
     public IssueController(IssueRepository issueRepository,
-                       UserRepository userRepository) {
+            UserRepository userRepository) {
         this.issueRepository = issueRepository;
         this.userRepository = userRepository;
     }
+
     @PostMapping
     public ResponseEntity<?> createIssue(@RequestBody IssueCreateRequest request,
-                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         User author = userDetails.getUser();
 
@@ -41,8 +49,7 @@ public class IssueController {
                 request.title(),
                 request.description(),
                 request.type(),
-                author
-        );
+                author);
         issue.setPriority(request.priority());
 
         Issue saved = issueRepository.save(issue);
@@ -52,9 +59,9 @@ public class IssueController {
 
     @GetMapping
     public ResponseEntity<List<Issue>> getIssues(
-        @RequestParam(required = false) IssueType type,
-        @RequestParam(required = false) IssueStatus status,
-        @RequestParam(required = false) Priority priority) {
+            @RequestParam(required = false) IssueType type,
+            @RequestParam(required = false) IssueStatus status,
+            @RequestParam(required = false) Priority priority) {
 
         List<Issue> issues = issueRepository.findAll();
 
@@ -73,11 +80,11 @@ public class IssueController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateIssue(
-        @PathVariable Long id,
-        @RequestBody IssueUpdateRequest request,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @PathVariable Long id,
+            @RequestBody IssueUpdateRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-            Issue issue = issueRepository.findById(id).orElseThrow(() -> new RuntimeException("Issue non trovata"));
+        Issue issue = issueRepository.findById(id).orElseThrow(() -> new RuntimeException("Issue non trovata"));
 
         User currentUser = userDetails.getUser();
 
@@ -102,20 +109,20 @@ public class IssueController {
 
         return ResponseEntity.ok(updated);
 
-    } 
+    }
 
     // Restituisce i dati della issue selezionata nel frontend
     @GetMapping("/{id}")
     public ResponseEntity<Issue> getIssueById(@PathVariable Long id) {
         Issue issue = issueRepository.findById(id).orElse(null);
 
-        if(issue == null){
+        if (issue == null) {
             return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(issue);
     }
-    
+
     // NUOVO METODO: salva l'utente assegnato alla issue
     @PutMapping("/{id}/assegnato")
     public ResponseEntity<?> assignIssue(
@@ -146,7 +153,4 @@ public class IssueController {
         return ResponseEntity.ok("Assegnazione salvata");
     }
 
-    // Dato ricevuto dal frontend: l'ID dell'utente scelto
-    public record AssegnazioneRequest(Long utenteId) {}
-
-}   
+}

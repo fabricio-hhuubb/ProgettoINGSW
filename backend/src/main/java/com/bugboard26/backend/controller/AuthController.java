@@ -1,18 +1,24 @@
 package com.bugboard26.backend.controller;
 
-import com.bugboard26.backend.model.Role;
-import com.bugboard26.backend.model.User;
-import com.bugboard26.backend.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bugboard26.backend.dto.LoginRequest;
+import com.bugboard26.backend.dto.RegisterRequest;
+import com.bugboard26.backend.dto.UserInfo;
+import com.bugboard26.backend.model.User;
+import com.bugboard26.backend.repository.UserRepository;
 import com.bugboard26.backend.security.UserDetailsImpl;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContext;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -26,8 +32,8 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
     public AuthController(AuthenticationManager authenticationManager,
-                           UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -37,18 +43,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        // Salva il contesto di sicurezza nella sessione HTTP -> genera il cookie JSESSIONID
+        // Salva il contesto di sicurezza nella sessione HTTP -> genera il cookie
+        // JSESSIONID
         HttpSession session = httpRequest.getSession(true);
         session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
         return ResponseEntity.ok("Login effettuato");
     }
-
 
     // LOGOUT
     @PostMapping("/logout")
@@ -77,8 +82,7 @@ public class AuthController {
         User newUser = new User(
                 request.email(),
                 passwordEncoder.encode(request.password()),
-                request.role()
-        );
+                request.role());
         userRepository.save(newUser);
 
         return ResponseEntity.ok("Utente creato");
@@ -91,12 +95,6 @@ public class AuthController {
         return ResponseEntity.ok(new UserInfo(user.getEmail(), user.getRole()));
     }
 
-    // Serve per restituire solo le informazioni utili al frontend
-    public record UserInfo(String email, Role role) {}
-
-    // DTO interni (record Java: sintassi compatta per classi "dati")
-    public record LoginRequest(String email, String password) {}
-    public record RegisterRequest(String email, String password, Role role) {}
 }
 
 // Cosa fa:
