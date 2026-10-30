@@ -14,24 +14,25 @@ import jakarta.validation.constraints.NotBlank;
 public class User {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //Databse genera automaticamente id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //Database genera automaticamente id
     private Long id;
 
     @NotBlank
-    @Email
+    @Email  // Deve avere formato di un email
     @Column(unique = true, nullable = false)
     private String email;
 
     @NotBlank
     @Column(nullable = false)
-    @JsonIgnore
+    @JsonIgnore // Ignora la password quando viene chiamato User
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
-    //Costruttore vuoto
+    //Costruttore vuoto obbligatorio per JPA
+    // Prima si crea un oggeto vuoto e poi si riempiono i campi
     public User(){
 
     }

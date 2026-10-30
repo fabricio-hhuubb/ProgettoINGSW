@@ -66,7 +66,7 @@ public class AuthController {
         return ResponseEntity.ok("Logout effettuato");
     }
 
-    // CREAZIONE UTENTE: accesso riservato agli admin in SecurityConfig
+    // CREAZIONE UTENTE accesso riservato agli admin in SecurityConfig
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
@@ -96,14 +96,3 @@ public class AuthController {
     }
 
 }
-
-// Cosa fa:
-
-// /login — riceve email/password, chiede a Spring Security
-// di verificarle (authenticationManager.authenticate),
-// se sono corrette salva l'utente autenticato nella sessione HTTP → il browser
-// riceve automaticamente un cookie JSESSIONID da quel momento in poi
-// /logout — invalida la sessione, il cookie non è più valido
-// /register — crea un nuovo utente, con la password
-// hashata tramite passwordEncoder.encode(...)
-// (qui usiamo finalmente l'hashing di cui parlavamo prima)

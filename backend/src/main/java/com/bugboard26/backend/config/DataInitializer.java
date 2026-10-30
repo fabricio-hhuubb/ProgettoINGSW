@@ -29,7 +29,7 @@ public class DataInitializer implements CommandLineRunner {
                     Role.ADMIN
             );
             userRepository.save(admin);
-            System.out.println("Admin di default creato: " + adminEmail + " / admin123");
+            System.out.println("Admin di default creato");
         }
     }
 }

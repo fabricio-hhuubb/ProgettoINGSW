@@ -30,16 +30,16 @@ public class Issue {
     private IssueStatus status;
 
     @Enumerated(EnumType.STRING)
-    private Priority priority; // opzionale
+    private Priority priority;
 
-    private String imageUrl; // opzionale, percorso/URL dell'immagine allegata
+    // Relazione tra tabelle 
 
+    // Utente creatore
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
     // Utente incaricato di occuparsi della issue
-    // Può essere null quando la issue non è ancora assegnata
     @ManyToOne
     @JoinColumn(name = "assegnato_id")
     private User assegnato;
@@ -103,14 +103,6 @@ public class Issue {
 
     public void setPriority(Priority priority) {
         this.priority = priority;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     public User getAuthor() {

@@ -123,7 +123,7 @@ public class IssueController {
         return ResponseEntity.ok(issue);
     }
 
-    // NUOVO METODO: salva l'utente assegnato alla issue
+    // NUOVO METODO salva l'utente assegnato alla issue
     @PutMapping("/{id}/assegnato")
     public ResponseEntity<?> assignIssue(
             @PathVariable Long id,
